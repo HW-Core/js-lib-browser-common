@@ -6,22 +6,22 @@ define([
     HW2PATH_JS_LIB + "browser/common/Browser.js"
 ], function () {
     var $ = Hw2Core;
-    return $.Browser.Path = $.Class({base: $.Path, members: [
+    return $.Browser.DOMTools = $.Class({base: $.Path, members: [
             {
                 attributes: "static",
                 name: "redraw",
-                val: function() {
-                    Hw2.JQ('body').hide();
-                    setTimeout(function() {
-                        Hw2.JQ('body').show();
+                val: function () {
+                    $.Browser.JQ('body').hide();
+                    setTimeout(function () {
+                        $.Browser.JQ('body').show();
                     }, 0);
                 }
             },
             {
                 attributes: "static",
                 name: "removeScrollBar",
-                val: function(selector) {
-                    var text = Hw2.JQ(selector);
+                val: function (selector) {
+                    var text = $.Browser.JQ(selector);
                     text.wrapAll('<div style="overflow:hidden; height:' + text.height() + 'px; width:' + text.width() + 'px" />');
                     text.css("width", text.width() + (text.width() - text[0].scrollWidth));
                 }
@@ -29,10 +29,10 @@ define([
             {
                 attributes: "static",
                 name: "centerImage",
-                val: function(imgSelector) {
-                    var img = Hw2.JQ(imgSelector);
+                val: function (imgSelector) {
+                    var img = $.Browser.JQ(imgSelector);
                     // we need to wait image loading
-                    img.load(function() {
+                    img.load(function () {
                         var parent = img.parent();
 
                         //get the width of the parent
@@ -54,7 +54,7 @@ define([
             {
                 name: "removeCss",
                 val: function (filename) {
-                    $.Browser.JQ("#" + Hw2Core.String.hashCode(filename)).remove();
+                    $.Browser.JQ("#" + $.String.hashCode(filename)).remove();
                 }
             }
         ]}

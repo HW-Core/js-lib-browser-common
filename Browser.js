@@ -3,14 +3,22 @@
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
 define([
-    HW2PATH_CORE + 'modules/dep/jquery/index.js'
-],
-function () {
-    $=Hw2Core;
-    $.Browser = $.Class({type:"final"});
-    
+    HW2PATH_CORE + 'modules/dep/jquery/index.js',
+    //HW2PATH_JS_LIB + 'browser/common/Loader.js'
+], function () {
+    var $ = Hw2Core;
+    $.Browser = $.Class({members: [
+            {
+                attributes: ["public", "static"],
+                name: "checkBasicReq",
+                val: function () {
+
+                }
+            }
+        ]});
+
     // static initialization
-    $.Browser.JQ=jQuery.noConflict(true);
-    
+    $.Browser.JQ = jQuery.noConflict(true);
+
     return $.Browser;
 });
