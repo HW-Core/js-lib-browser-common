@@ -5,34 +5,46 @@
 define([
     HW2PATH_JS_LIB + "browser/common/Browser.js",
     HW2PATH_JS_LIB + "browser/common/DOMTools.js",
+    HW2PATH_JS_LIB + "common/Var.js",
     HW2PATH_JS_LIB + "common/Path.js",
     HW2PATH_JS_KERNEL + "Loader.js"
 ], function () {
     var $ = Hw2Core;
     return $.Browser.Loader = $.Class({base: Hw2Core.Loader, members: [
             {
+                /**
+                 * src {String} -> path of resource to load
+                 * options {Object}:
+                 * callback {Function} -> function to cast as callback
+                 * sync {Boolen} -> load in async/sync mode
+                 * filetype { String } -> you can define file type manually if needed ( html/js etc)
+                 */
                 // overwrite Hw2Core.Loader.load
                 attributes: ["public", "static"],
                 name: "load",
-                val: function (filename, callback, filetype, sync) {
-                    if (!filetype) {
-                        filetype = Hw2Core.Path.extension(filename);
-                    }
+                val: function (src, callback, options) {
+                    options = options || {};
+                    options.filetype = options.filetype!==undefined ? options.filetype : Hw2Core.Path.extension(src);
+                    options.sync = options.sync !== undefined ? options.sync : false;
 
-                    switch (filetype) {
+                    switch (options.filetype) {
                         case "css":
-                            this.__st._loadCss(filename, callback, sync);
+                            this.__s._loadCss(src, callback, options.sync);
                             break;
                         case "js":
-                            this._super(filename, callback, sync);
+                            this._super(src, callback, options.sync);
                             break;
                         case "html" || "htm":
-                            Hw2.JQ.ajaxSetup({async: !sync});
-                            $.Browser.JQ.ajax(filename).done(callback);
-                            Hw2.JQ.ajaxSetup({async: true});
+                            $.Browser.JQ.ajaxSetup({async: !options.sync});
+                            if ($.Var.isset(function() { return options.selector;})) {
+                                $.Browser.JQ(options.selector).load(src,null,callback);
+                            } else {
+                                $.Browser.JQ.ajax(src).done(callback);
+                            }
+                            $.Browser.JQ.ajaxSetup({async: true});
                             break;
                         default:
-                            console.error("filetype: " + filetype + " not supported!")
+                            console.error("filetype: " + options.filetype + " not supported!")
                             return false;
                     }
 

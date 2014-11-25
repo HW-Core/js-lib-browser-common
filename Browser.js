@@ -4,18 +4,10 @@
  */
 define([
     HW2PATH_CORE + 'modules/dep/jquery/index.js',
-    //HW2PATH_JS_LIB + 'browser/common/Loader.js'
+    HW2PATH_JS_LIB + 'browser/common/Loader.js'
 ], function () {
     var $ = Hw2Core;
-    $.Browser = $.Class({members: [
-            {
-                attributes: ["public", "static"],
-                name: "checkBasicReq",
-                val: function () {
-
-                }
-            }
-        ]});
+    $.Browser = $.Class({});
 
     // static initialization
     $.Browser.JQ = jQuery.noConflict(true);

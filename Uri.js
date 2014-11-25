@@ -15,13 +15,13 @@ define([
             },
             {
                 attributes: "static",
-                name: "getInstance",
+                name: "I",
                 val: function (make_new) {
-                    if (make_new || !pub_st.instance) {
-                        pub_st.instance = new $.Browser.Uri(document.location.href);
+                    if (make_new || !this.__s.instance) {
+                        this.__s.instance = new $.Browser.Uri(document.location.href);
                     }
 
-                    return pub_st.instance;
+                    return this.__s.instance;
                 }
             },
             {

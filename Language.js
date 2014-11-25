@@ -15,7 +15,7 @@ define([
             },
             {
                 attributes: "public",
-                name: "__constructor",
+                name: "__construct",
                 val: function () {
                     this.lang = window.localStorage.getItem("lang") || "it";
                     var lang = $.Browser.Uri.getInstance().getParam("lang");
