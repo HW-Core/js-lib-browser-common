@@ -27,7 +27,7 @@ define([
                 attributes: "public",
                 name: "changeLang",
                 val: function (lang) {
-                    if (!lang in langs)
+                    if (!lang in this._s.langs)
                         return false;
 
                     var old = this.lang;

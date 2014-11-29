@@ -29,7 +29,7 @@ define([
 
                     switch (options.filetype) {
                         case "css":
-                            this.__s._loadCss(src, callback, options.sync);
+                            this._s._loadCss(src, callback, options.sync);
                             break;
                         case "js":
                             this._super(src, callback, options.sync);

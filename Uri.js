@@ -32,7 +32,7 @@ define([
                         search = document.location.search.substr(1);
 
                     $.Browser.JQ.each(params, function (key, value) {
-                        search = _updateParam(search, key, value, remove);
+                        search = this.s.updateParam(search, key, value, remove);
                     });
 
                     //this will reload the page, it's likely better to store this until finished
@@ -54,7 +54,7 @@ define([
             },
             {
                 attributes: "private static",
-                name: "_updateParam",
+                name: "updateParam",
                 val: function (search, key, value, remove) {
                     key = encodeURI(key);
                     value = encodeURI(value);
