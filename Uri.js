@@ -17,11 +17,11 @@ define([
                 attributes: "static",
                 name: "I",
                 val: function (make_new) {
-                    if (make_new || !this.__s.instance) {
-                        this.__s.instance = new $.Browser.Uri(document.location.href);
+                    if (make_new || !this._s.instance) {
+                        this._s.instance = new $.Browser.Uri(document.location.href);
                     }
 
-                    return this.__s.instance;
+                    return this._s.instance;
                 }
             },
             {
@@ -32,7 +32,7 @@ define([
                         search = document.location.search.substr(1);
 
                     $.Browser.JQ.each(params, function (key, value) {
-                        search = this.s.updateParam(search, key, value, remove);
+                        search = this._s.updateParam(search, key, value, remove);
                     });
 
                     //this will reload the page, it's likely better to store this until finished
@@ -49,7 +49,7 @@ define([
                 {
                     var tmp = {};
                     tmp[key] = value;
-                    pub_st.updateParams(tmp, remove, refresh, search);
+                    this.s.updateParams(tmp, remove, refresh, search);
                 }
             },
             {
