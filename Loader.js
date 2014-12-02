@@ -2,15 +2,18 @@
  * Copyright (C) 2007 - 2014 Hyperweb2 All rights reserved.
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
-define([
-    HW2PATH_JS_LIB + "browser/common/Browser.js",
-    HW2PATH_JS_LIB + "browser/common/DOMTools.js",
-    HW2PATH_JS_LIB + "common/Var.js",
-    HW2PATH_JS_LIB + "common/Path.js",
-    HW2PATH_JS_KERNEL + "Loader.js"
+
+'use strict';
+
+hw2.define([
+    "hw2!PATH_JS_LIB:browser/common/Browser.js",
+    "hw2!PATH_JS_LIB:browser/common/DOMTools.js",
+    "hw2!PATH_JS_LIB:common/Var.js",
+    "hw2!PATH_JS_LIB:common/Path.js",
+    "hw2!PATH_JS_KERNEL:Loader.js"
 ], function () {
-    var $ = Hw2Core;
-    return $.Browser.Loader = $.Class({base: Hw2Core.Loader, members: [
+    var $ = this;
+    $.Browser.Loader = $.Class({base: $.Loader, members: [
             {
                 /**
                  * src {String} -> path of resource to load
@@ -24,7 +27,7 @@ define([
                 name: "load",
                 val: function (src, callback, options) {
                     options = options || {};
-                    options.filetype = options.filetype!==undefined ? options.filetype : Hw2Core.Path.extension(src);
+                    options.filetype = options.filetype !== undefined ? options.filetype : $.Path.extension(src);
                     options.sync = options.sync !== undefined ? options.sync : false;
 
                     switch (options.filetype) {
@@ -36,8 +39,10 @@ define([
                             break;
                         case "html" || "htm":
                             $.Browser.JQ.ajaxSetup({async: !options.sync});
-                            if ($.Var.isset(function() { return options.selector;})) {
-                                $.Browser.JQ(options.selector).load(src,null,callback);
+                            if ($.Var.isset(function () {
+                                return options.selector;
+                            })) {
+                                $.Browser.JQ(options.selector).load(src, null, callback);
                             } else {
                                 $.Browser.JQ.ajax(src).done(callback);
                             }

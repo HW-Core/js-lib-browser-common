@@ -2,12 +2,15 @@
  * Copyright (C) 2007 - 2014 Hyperweb2 All rights reserved.
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
-define([
-    HW2PATH_JS_LIB + "browser/common/Browser.js",
-    HW2PATH_JS_LIB + "common/Path.js"
+
+'use strict';
+
+hw2.define([
+    "hw2!PATH_JS_LIB:browser/common/Browser.js",
+    "hw2!PATH_JS_LIB:common/Path.js"
 ], function () {
-    var $ = Hw2Core;
-    return $.Browser.Path = $.Class({base: $.Path, members: [
+    var $ = this;
+    $.Browser.Path = $.Class({base: $.Path, members: [
             {
                 attributes: "static",
                 name: "fileExists",

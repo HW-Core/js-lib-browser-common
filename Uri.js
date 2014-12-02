@@ -2,12 +2,15 @@
  * Copyright (C) 2007 - 2014 Hyperweb2 All rights reserved.
  * GNU General Public License version 3; see www.hyperweb2.com/terms/
  */
-define([
-    HW2PATH_JS_LIB + "browser/common/Browser.js",
-    HW2PATH_JS_LIB + "common/Uri.js"
+
+'use strict';
+
+hw2.define([
+    "hw2!PATH_JS_LIB:browser/common/Browser.js",
+    "hw2!PATH_JS_LIB:common/Uri.js"
 ], function () {
-    var $ = Hw2Core;
-    return $.Browser.Uri = $.Class({base: $.Uri, members: [
+    var $ = this;
+    $.Browser.Uri = $.Class({base: $.Uri, members: [
             {
                 attributes: "static",
                 name: "instance",
