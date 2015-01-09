@@ -7,59 +7,131 @@
 
 hw2.define([
     "hw2!PATH_JS_LIB:browser/common/Browser.js",
-    "hw2!PATH_JS_LIB:browser/common/DOMTools.js",
-    "hw2!PATH_JS_LIB:common/Var.js",
-    "hw2!PATH_JS_LIB:common/Path.js",
-    "hw2!PATH_JS_KERNEL:Loader.js"
+    //"hw2!PATH_JS_LIB:browser/gui/DOMTools.js",
+    "hw2!PATH_JS_LIB:common/String.js",
+    "hw2!PATH_JS_LIB:filesystem/Path.js"
 ], function () {
     var $ = this;
     $.Browser.Loader = $.Class({base: $.Loader, members: [
             {
                 /**
-                 * src {String} -> path of resource to load
-                 * options {Object}:
-                 * callback {Function} -> function to cast as callback
-                 * sync {Boolen} -> load in async/sync mode
-                 * filetype { String } -> you can define file type manually if needed ( html/js etc)
+                 * overwrite Hw2Core.Loader.load
+                 * @returns {Promise}
                  */
-                // overwrite Hw2Core.Loader.load
                 attributes: ["public", "static"],
                 name: "load",
                 val: function (src, callback, options) {
                     options = options || {};
-                    options.filetype = options.filetype !== undefined ? options.filetype : $.Path.extension(src);
-                    options.sync = options.sync !== undefined ? options.sync : false;
+                    options.sync = false;
+                    return this._s.load(src, callback, options);
+                }
+            },
+            {
+                /**
+                 * overwrite Hw2Core.Loader.loadSync
+                 */
+                attributes: ["public", "static"],
+                name: "loadSync",
+                val: function (src, options) {
+                    options = options || {};
+                    options.sync = true;
+                    return this._s.load(src, null, options);
+                }
+            },
+            {
+                /**
+                 * NOTE: For html files the content will be passed as string to callback function
+                 * 
+                 * src {String} -> path of resource to load
+                 * callback {Function} -> function to cast as callback
+                 * options {Object}:
+                 * selector {String} -> select the element[s] 
+                 * where the retrieved data must be printed ( only for html )
+                 * sync {Boolen} -> load in async/sync mode
+                 * force {Boolen} -> force reload of css if already exists
+                 * filetype { String } -> you can define file type manually if needed ( html/js etc)
+                 */
+                attributes: ["private", "static"],
+                name: "load",
+                val: function (src, callback, options) {
+                    src = Array.isArray(src) ? src : [src];
 
-                    switch (options.filetype) {
-                        case "css":
-                            this._s._loadCss(src, callback, options.sync);
-                            break;
-                        case "js":
-                            this._super(src, callback, options.sync);
-                            break;
-                        case "html" || "htm":
-                            $.Browser.JQ.ajaxSetup({async: !options.sync});
-                            if ($.Var.isset(function () {
-                                return options.selector;
-                            })) {
-                                $.Browser.JQ(options.selector).load(src, null, callback);
-                            } else {
-                                $.Browser.JQ.ajax(src).done(callback);
-                            }
-                            $.Browser.JQ.ajaxSetup({async: true});
-                            break;
-                        default:
-                            console.error("filetype: " + options.filetype + " not supported!")
-                            return false;
+                    var promises = [];
+                    var that = this;
+                    src.forEach(function (src) {
+                        var ftype = options.filetype !== undefined ? options.filetype : $.Path.extension(src);
+
+                        switch (ftype) {
+                            case "css":
+                                promises.push(that._s.loadCss(src, callback, options.sync, options.force));
+                                break;
+                            case "js":
+                                promises.push(
+                                        options.sync ?
+                                        that.__parent.loadSync(src, options) :
+                                        that.__parent.load(src, null, options)
+                                        );
+                                break;
+                            case "html" || "htm":
+                                var deferred = false;
+                                $.Browser.JQ.ajaxSetup({async: !options.sync});
+
+                                if ($.Var.isset(function () {
+                                    return options.selector;
+                                })) {
+                                    var el = $.Browser.JQ(options.selector);
+                                    var size = el.size();
+                                    deferred = $.Q.defer();
+                                    var cb = function () {
+                                        size--;
+                                        if (size === 0) {
+                                            // resolve only when all elements
+                                            // has been loaded
+                                            deferred.resolve(arguments);
+                                        }
+                                    };
+
+                                    el.load(src, null, cb);
+
+                                    promises.push(deferred.promise);
+                                } else {
+                                    deferred = $.Q.defer();
+                                    var cb = function () {
+                                        deferred.resolve(arguments);
+                                    };
+
+                                    $.Browser.JQ.ajax(src).done(cb);
+
+                                    promises.push(deferred.promise);
+                                }
+
+                                $.Browser.JQ.ajaxSetup({async: true});
+
+                                promises.push(deferred);
+                                break;
+                            default:
+                                console.error("filetype: " + ftype + " for file " + src + " not supported!");
+                                promises.push(false);
+                        }
+
+                    });
+
+                    var res = $.Q.all(promises);
+
+                    if (callback) {
+                        res.then(function () {
+                            callback.apply(null, arguments);
+                        });
+                    } else {
+                        return res;
                     }
-
-                    return true;
                 }
             },
             {
                 attributes: ["private", "static"],
-                name: "_loadCss",
-                val: function (path, fn, sync, scope) {
+                name: "loadCss",
+                val: function (path, fn, sync, force, scope) {
+                    var deferred = $.Q.defer();
                     var timeOut = 15000;
                     var timeout_id, interval_id;
 
@@ -68,6 +140,20 @@ hw2.define([
                     link.setAttribute('href', path);
                     link.setAttribute('rel', 'stylesheet');
                     link.setAttribute('type', 'text/css');
+
+                    var hash = $.String.hashCode(path);
+
+                    // if css already exits, avoid to reload it
+                    var old = $.JQ("#" + hash);
+                    if (old.size() > 0) {
+                        if (!force) {
+                            deferred.resolve(true);
+                            return deferred.promise;
+                        }
+                    }
+
+                    // set id as hashcode of path to easy recover it
+                    link.setAttribute('id', hash);
 
                     var sheet, cssRules;
                     // get the correct properties to check for depending on the browser
@@ -80,7 +166,7 @@ hw2.define([
                         cssRules = 'rules';
                     }
 
-                    head.appendChild(link);
+                    old.size() > 0 ? old.replaceWith(link) : head.appendChild(link);
 
                     function checkLoad () {
                         try {
@@ -91,7 +177,8 @@ hw2.define([
                                 }
                                 // insert the link node into the DOM and start loading the style sheet
 
-                                fn.call(scope, link);           // fire the callback with link
+                                fn && fn.call(scope, link);           // fire the callback with link
+                                deferred.resolve(link); // set promise as resolved
                                 return true;
                             } else {
                                 return false;
@@ -105,7 +192,11 @@ hw2.define([
                         clearInterval(interval_id);            // clear the counters
                         clearTimeout(timeout_id);
                         head.removeChild(link);                // since the style sheet didn't load, remove the link node from the DOM
-                        fn.call(scope, false); // fire the callback with success == false
+
+                        fn && fn.call(scope, false) // fire the callback with success == false
+
+                        deferred.reject(false); // set promise as rejected
+
                         link = false;
                     }
 
@@ -132,8 +223,15 @@ hw2.define([
                         checkLoad();
                     }, 10); // how often to check if the stylesheet is loaded
 
-                    return link; // return the link node;
+                    return deferred.promise;
                     //}
+                }
+            },
+            {
+                attributes: ["public", "static"],
+                name: "removeCss",
+                val: function (filename) {
+                    $.Browser.JQ("#" + $.String.hashCode(filename)).remove();
                 }
             }
         ]

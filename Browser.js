@@ -6,7 +6,8 @@
 'use strict';
 
 hw2.define([
-    'hw2!PATH_CORE:modules/dep/jquery/index.js'
+    'hw2!PATH_CORE:modules/dep/jquery/index.js',
+    "hw2!PATH_JS_LIB:common/index.js"
 ], function () {
     var $ = this;
     $.Browser = $.Class({});

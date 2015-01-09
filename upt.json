@@ -3,10 +3,13 @@
     "license": "http://www.hyperweb2.com/terms",
     "dependencies": {
         "%shared-common": "hw2-core/js-library-common#*",
+        "%shared-fs": "hw2-core/js-library-filesystem#*",
+        "%gui" : "hw2-core/js-library-browser-gui",
         "hw2/modules/dep/jquery": "http://code.jquery.com/jquery-2.1.1.min.js"
     },
     "devDependencies": {
-        "%tests": "hw2-core/js-library-browser-common#tests"
+        "%tests": "hw2-core/js-library-browser-common#tests",
+        "%doc": "hw2-core/js-library-browser-common#doc"
     },
     "_comment_keep": "ensure we keep the right git repository configurations",
     "keep": [
