@@ -6,8 +6,8 @@
 'use strict';
 
 hw2.define([
-    'hw2!PATH_JS_LIB:browser/common/Browser.js',
-    'hw2!PATH_JS_LIB:browser/common/Loader.js'
+    'hw2!{PATH_JS_LIB}browser/common/Browser.js',
+    'hw2!{PATH_JS_LIB}browser/common/Loader.js'
 ],function () {
     var $ = this;
 });

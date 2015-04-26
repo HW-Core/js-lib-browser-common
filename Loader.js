@@ -6,10 +6,10 @@
 'use strict';
 
 hw2.define([
-    "hw2!PATH_JS_LIB:browser/common/Browser.js",
-    //"hw2!PATH_JS_LIB:browser/gui/DOMTools.js",
-    "hw2!PATH_JS_LIB:common/String.js",
-    "hw2!PATH_JS_LIB:filesystem/Path.js"
+    "hw2!{PATH_JS_LIB}browser/common/Browser.js",
+    //"hw2!{PATH_JS_LIB}browser/gui/DOMTools.js",
+    "hw2!{PATH_JS_LIB}common/String.js",
+    "hw2!{PATH_JS_LIB}filesystem/Path.js"
 ], function () {
     var $ = this;
     $.Browser.Loader = $.Class({base: $.Loader, members: [
@@ -53,12 +53,12 @@ hw2.define([
                  */
                 attributes: ["private", "static"],
                 name: "load",
-                val: function (src, callback, options) {
-                    src = Array.isArray(src) ? src : [src];
+                val: function (srcList, callback, options) {
+                    srcList = Array.isArray(srcList) ? srcList : [srcList];
 
                     var promises = [];
                     var that = this;
-                    src.forEach(function (src) {
+                    srcList.forEach(function (src) {
                         var ftype = options.filetype !== undefined ? options.filetype : $.Path.extension(src);
 
                         switch (ftype) {
@@ -81,7 +81,7 @@ hw2.define([
                                 })) {
                                     var el = $.Browser.JQ(options.selector);
                                     var size = el.size();
-                                    deferred = $.Q.defer();
+                                    deferred = $.Async.defer();
                                     var cb = function () {
                                         size--;
                                         if (size === 0) {
@@ -95,7 +95,7 @@ hw2.define([
 
                                     promises.push(deferred.promise);
                                 } else {
-                                    deferred = $.Q.defer();
+                                    deferred = $.Async.defer();
                                     var cb = function () {
                                         deferred.resolve(arguments);
                                     };
@@ -116,7 +116,7 @@ hw2.define([
 
                     });
 
-                    var res = $.Q.all(promises);
+                    var res = $.Async.all(promises);
 
                     if (callback) {
                         res.then(function () {
@@ -131,7 +131,7 @@ hw2.define([
                 attributes: ["private", "static"],
                 name: "loadCss",
                 val: function (path, fn, sync, force, scope) {
-                    var deferred = $.Q.defer();
+                    var deferred = $.Async.defer();
                     var timeOut = 15000;
                     var timeout_id, interval_id;
 
@@ -144,7 +144,7 @@ hw2.define([
                     var hash = $.String.hashCode(path);
 
                     // if css already exits, avoid to reload it
-                    var old = $.JQ("#" + hash);
+                    var old = $.Browser.JQ("#" + hash);
                     if (old.size() > 0) {
                         if (!force) {
                             deferred.resolve(true);
@@ -184,6 +184,7 @@ hw2.define([
                                 return false;
                             }
                         } catch (e) {
+                            console.log(e);
                             return false;
                         }
                     }
