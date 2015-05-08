@@ -1,11 +1,12 @@
 {
-    "name": "hw2/modules/js/src/kernel/tests",
-    "license": "http://www.hyperweb2.com/terms",
-    "dependencies": {
-        "%parent-lib": "hw2-core/js-kernel"
-    },
-    "_comment_keep": "ensure we keep the right git repository configurations",
-    "keep": [
-        ".git/config"
-    ]
+  "name": "hw2/modules/js/src/kernel/doc",
+  "license": "http://www.hyperweb2.com/terms",
+  "dependencies": {
+    "%parent-lib": "hw2-core/js-kernel"
+  },
+  "_comment_keep": "ensure we keep the right git repository configurations",
+  "keep": [
+    ".git/config"
+  ],
+  "version": "0.0.1"
 }
