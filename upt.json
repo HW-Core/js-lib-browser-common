@@ -1,5 +1,5 @@
 {
-  "name": "hw2/modules/js/src/kernel/doc",
+  "name": "hw2/modules/js/src/kernel/tests",
   "license": "http://www.hyperweb2.com/terms",
   "dependencies": {
     "%parent-lib": "hw2-core/js-kernel"
