@@ -15,7 +15,7 @@ hw2.define([
     $.Browser.Loader = $.Class({base: $.Loader, members: [
             {
                 /**
-                 * overwrite Hw2Core.Loader.load
+                 * overwrite Loader.load
                  * @returns {Promise}
                  */
                 attributes: ["public", "static"],
@@ -28,7 +28,7 @@ hw2.define([
             },
             {
                 /**
-                 * overwrite Hw2Core.Loader.loadSync
+                 * overwrite Loader.loadSync
                  */
                 attributes: ["public", "static"],
                 name: "loadSync",
@@ -43,7 +43,7 @@ hw2.define([
                  * NOTE: For html files the content will be passed as string to callback function
                  * 
                  * src {String} -> path of resource to load
-                 * callback {Function} -> function to cast as callback
+                 * callback {Function} -> function to cast as callback, if not defined then will be returned a promise
                  * options {Object}:
                  * selector {String} -> select the element[s] 
                  * where the retrieved data must be printed ( only for html )
@@ -68,8 +68,8 @@ hw2.define([
                             case "js":
                                 promises.push(
                                         options.sync ?
-                                        that.__parent.loadSync(src, options) :
-                                        that.__parent.load(src, null, options)
+                                        that._s.__parent.loadSync(src, options) :
+                                        that._s.__parent.load(src, null, options)
                                         );
                                 break;
                             case "html" || "htm":
@@ -82,7 +82,7 @@ hw2.define([
                                     var el = $.Browser.JQ(options.selector);
                                     var size = el.size();
                                     deferred = $.Async.defer();
-                                    var cb = function () {
+                                    var cb = function (responseText, textStatus, jqXHR) {
                                         size--;
                                         if (size === 0) {
                                             // resolve only when all elements
