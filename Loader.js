@@ -5,11 +5,11 @@
 
 'use strict';
 
-hw2.define([
-    "hw2!{PATH_JS_LIB}browser/common/Browser.js",
-    //"hw2!{PATH_JS_LIB}browser/gui/DOMTools.js",
-    "hw2!{PATH_JS_LIB}common/String.js",
-    "hw2!{PATH_JS_LIB}filesystem/Path.js"
+hwc.define([
+    "hwc!{PATH_JS_LIB}browser/common/Browser.js",
+    //"hwc!{PATH_JS_LIB}browser/gui/DOMTools.js",
+    "hwc!{PATH_JS_LIB}common/String.js",
+    "hwc!{PATH_JS_LIB}filesystem/Path.js"
 ], function () {
     var $ = this;
     $.Browser.Loader = $.Class({base: $.Loader, members: [
@@ -67,13 +67,15 @@ hw2.define([
                                 break;
                             case "js":
                                 promises.push(
-                                        options.sync ?
-                                        that._s.__parent.loadSync(src, options) :
-                                        that._s.__parent.load(src, null, options)
-                                        );
+                                    options.sync ?
+                                    that._s.__parent.loadSync(src, options) :
+                                    that._s.__parent.load(src, null, options)
+                                    );
                                 break;
                             case "html" || "htm":
-                                var deferred = false;
+                                var deferred = $.Async.defer();
+                                var cb = null;
+
                                 $.Browser.JQ.ajaxSetup({async: !options.sync});
 
                                 if ($.Var.isset(function () {
@@ -81,33 +83,33 @@ hw2.define([
                                 })) {
                                     var el = $.Browser.JQ(options.selector);
                                     var size = el.size();
-                                    deferred = $.Async.defer();
-                                    var cb = function (responseText, textStatus, jqXHR) {
+
+                                    cb = function (responseText, textStatus, jqXHR) {
                                         size--;
+                                        // resolve only when all elements
+                                        // has been loaded
                                         if (size === 0) {
-                                            // resolve only when all elements
-                                            // has been loaded
+                                            var insType = options.insType || 'html';
+
+                                            if (['prepend', 'append', 'replaceWith', 'html'].indexOf(insType) < 0)
+                                                console.error(insType + " is not a valid inserting function");
+
+                                            el[insType](responseText);
+
                                             deferred.resolve(arguments);
                                         }
                                     };
-
-                                    el.load(src, null, cb);
-
-                                    promises.push(deferred.promise);
                                 } else {
-                                    deferred = $.Async.defer();
-                                    var cb = function () {
+                                    cb = function () {
                                         deferred.resolve(arguments);
                                     };
-
-                                    $.Browser.JQ.ajax(src).done(cb);
-
-                                    promises.push(deferred.promise);
                                 }
+
+                                $.Browser.JQ.ajax(src).done(cb);
 
                                 $.Browser.JQ.ajaxSetup({async: true});
 
-                                promises.push(deferred);
+                                promises.push(deferred.promise);
                                 break;
                             default:
                                 console.error("filetype: " + ftype + " for file " + src + " not supported!");
@@ -120,10 +122,14 @@ hw2.define([
 
                     if (callback) {
                         res.then(function () {
-                            callback.apply(null, arguments);
+                            callback.apply(null, arguments[0]);
                         });
                     } else {
-                        return res;
+                        return $.Async.promise(function (resolve) {
+                            res.then(function () {
+                                resolve.apply(null, arguments[0]);
+                            });
+                        });
                     }
                 }
             },
@@ -136,7 +142,7 @@ hw2.define([
                     var timeout_id, interval_id;
 
                     var head = document.getElementsByTagName('head')[0], // reference to document.head for appending/ removing link nodes
-                            link = document.createElement('link');           // create the link node
+                        link = document.createElement('link');           // create the link node
                     link.setAttribute('href', path);
                     link.setAttribute('rel', 'stylesheet');
                     link.setAttribute('type', 'text/css');
