@@ -6,7 +6,7 @@
 'use strict';
 
 hwc.define([
-    "hwc!{PATH_JS_LIB}browser/common/Browser.js",
+    "hwc!{PATH_JS_LIB}browser-common/Browser.js",
     //"hwc!{PATH_JS_LIB}browser/gui/DOMTools.js",
     "hwc!{PATH_JS_LIB}common/String.js",
     "hwc!{PATH_JS_LIB}filesystem/Path.js"

@@ -6,8 +6,8 @@
 'use strict';
 
 hwc.define([
-    'hwc!{PATH_JS_LIB}browser/common/Browser.js',
-    'hwc!{PATH_JS_LIB}browser/common/Loader.js'
+    'hwc!{PATH_JS_LIB}browser-common/Browser.js',
+    'hwc!{PATH_JS_LIB}browser-common/Loader.js'
 ],function () {
     var $ = this;
     

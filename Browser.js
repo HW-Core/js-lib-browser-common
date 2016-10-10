@@ -6,7 +6,7 @@
 'use strict';
 
 hwc.define([
-    'hwc!{PATH_CORE}modules/js/modules/jquery/index.js',
+    'hwc!{PATH_CORE}js-modules/jquery/index.js',
     "hwc!{PATH_JS_LIB}common/index.js"
 ], function () {
     var $ = this;
